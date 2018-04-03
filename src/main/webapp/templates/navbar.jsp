@@ -7,9 +7,27 @@
             
       <nav class="my-2 my-md-0 mr-md-10">
         <a class="p-2 text-dark" href="generar-mesa">Mesa</a>        
-        <a class="p-2 text-dark" href="calculadora"> Calculadora</a>     
+        <a class="p-2 text-dark" href="calculadora"> Calculadora</a>    
+         
       </nav>
-      <a class="btn btn-outline-primary" href="login">Login</a>
+     
+   
+   
+      <c:if test= "${empty usuario}">
+       
+          <a class="btn btn-outline-primary" href="login">Login</a>
+      </c:if>
+      
+      
+      <c:if test= "${!empty usuario}">
+      	 <span class="badge badge-primary">${usuario}</span>
+      	   <a class="btn btn-outline-success" href="index.jsp">BackOffice</a>
+         <a class="btn btn-outline-danger" href="logout">Logout</a>
+         
+     </c:if>
+     
+       
+  
     </div>
     
     <div class="container">
