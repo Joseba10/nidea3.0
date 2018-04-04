@@ -22,13 +22,7 @@
         <tfoot>
            
         <tbody>
- 
-        
-        
-                
-        
-             
-       
+
 <c:forEach items="${materiales}" var="material">
 
 
