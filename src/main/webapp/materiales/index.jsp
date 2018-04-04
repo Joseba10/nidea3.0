@@ -26,16 +26,13 @@
 		 </c:when>
 		  <c:otherwise></c:otherwise>
 		 </c:choose>
-		 
-		
-		 
-
-  
-		
-		
-					
+	
 		</c:forEach>
 </ol>
+
+
+
+
 
 
 <jsp:include page="/templates/footer.jsp"></jsp:include>

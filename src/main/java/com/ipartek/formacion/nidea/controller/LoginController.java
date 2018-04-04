@@ -80,7 +80,7 @@ public class LoginController extends HttpServlet {
 				
 				request.setAttribute("materiales", dao.getAll());
 				
-				view = "backoffice/index.jsp";
+				view = "backoffice/materiales";
 				alert = new Alert("Ongi Etorri", Alert.TIPO_PRIMARY);
 			} else {
 
