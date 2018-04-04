@@ -51,6 +51,8 @@ public class MaterialDAO {
 			final String URL = "jdbc:mysql://192.168.0.42/spoty?user=alumno&password=alumno";
 			con = DriverManager.getConnection(URL);
 			String sql = "SELECT id, nombre, precio FROM material;";
+			
+			String search ="Select id,nombre,precio FROM material where nombre like '%a%' ORDER BY id DESC LIMIT 500";
 
 			pst = con.prepareStatement(sql);
 			rs = pst.executeQuery();

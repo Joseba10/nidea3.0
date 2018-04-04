@@ -34,6 +34,9 @@ public class MaterialesController extends HttpServlet {
 		ArrayList<Material> materiales = new ArrayList<Material>();
 		Alert alert=null;
 		try {
+			String search = request.getParameter("search");
+			System.out.println("Filtro busqueda= "+ search);
+			
 		MaterialDAO dao = MaterialDAO.getInstance();
  		materiales= dao.getAll();
  		}

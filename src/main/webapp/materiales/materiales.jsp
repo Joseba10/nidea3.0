@@ -10,25 +10,47 @@
 	  //Podemos usar cualquier expresion,si no hay expresion pinta la variable
 %>
 
-<ol>
+<table id="example" class="display" cellspacing="0" width="100%">
+        <thead>
+            <tr>
+     			<th>Id</th>
+                <th>Material</th>
+                <th>Precio</th>
+              
+            </tr>
+        </thead>
+        <tfoot>
+           
+        <tbody>
+
 <c:forEach items="${materiales}" var="material">
 
 
 <c:choose> 
 		
 		<c:when test = "${(material.precio >= 6.0) && (material.precio <= 24)}">
-	
- 	<li class="text-primary">${material.nombre} - ${material.precio} &euro;</li>
+	           <tr>
+	<td class="text-primary">${material.id} </td>
+ 	<td class="text-primary">${material.nombre} </td>
+ 	<td class="text-primary"> ${material.precio} &euro;</td>
+ 	</tr>
 		 </c:when>
        
    <c:when test = "${material.precio >= 25.0}">
- <li class="text-danger">${material.nombre} - ${material.precio} &euro;</li>
+   <tr>
+   	<td class="text-primary">${material.id} </td>
+ 	<td class="text-danger">${material.nombre} </td> 
+ 	<td class="text-danger"> ${material.precio} &euro;</td>
+ 	   </tr>
 		 </c:when>
 		  <c:otherwise></c:otherwise>
 		 </c:choose>
 	
 		</c:forEach>
-</ol>
+		
+		
+		     </tbody>
+    </table>
 
 
 
