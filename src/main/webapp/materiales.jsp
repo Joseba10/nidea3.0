@@ -1,3 +1,5 @@
+<%@page import="com.ipartek.formacion.nidea.controller.backoffice.MaterialesController"%>
+
 <%@include file="/templates/head.jsp" %>
 <%@include file="/templates/navbar.jsp" %>
 <%@include file="/templates/alert.jsp" %>
@@ -45,7 +47,7 @@
 		 </c:when>
 		  <c:otherwise></c:otherwise>
 		 </c:choose>
-	
+
 		</c:forEach>
 		
 		

@@ -3,6 +3,8 @@ package com.ipartek.formacion.nidea.controller.backoffice;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -19,46 +21,200 @@ import com.ipartek.formacion.nidea.pojo.Material;
 @WebServlet("/backoffice/materiales")
 public class MaterialesController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-       
-    /**
-     * @see HttpServlet#HttpServlet()
-     */
-    public MaterialesController() {
-        super();
-   
-    }
 
-	
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-		ArrayList<Material> materiales = new ArrayList<Material>();
-		Alert alert=null;
+	private static final String VIEW_INDEX = "materiales/index.jsp";
+	private static final String VIEW_FORM = "materiales/form.jsp";
+	private RequestDispatcher dispatcher;
+	private Alert alert;
+
+	public static final int OP_MOSTRAR_FORMULARIO = 1;
+	public static final int OP_BUSQUEDA = 14;
+	public static final int OP_ELIMINAR = 13;
+	public static final int OP_GUARDAR = 2;
+
+	// PARAMETROS
+
+	// Parametros Comunes
+	private String search; // Buscador por Nombre del Material
+	private int op; // Operacion a realizar
+
+	// Parametros de Material
+	private int id;
+	private String nombre;
+	private float precio;
+
+	private MaterialDAO dao;
+
+	@Override
+	public void init(ServletConfig config) throws ServletException {
+
+		/**
+		 * Se ejecuta una sola vez con la primera ejecucion que se realiza
+		 */
+		super.init(config);
+		dao = MaterialDAO.getInstance();
+	}
+
+	/**
+	 * Se destruye cuando se cierra tomcat o servidor de aplicaciones
+	 */
+	@Override
+	public void destroy() {
+
+		super.destroy();
+		dao = null;
+	}
+
+	@Override
+	protected void service(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		System.out.println("Antes de ejecutar DoGet/DoPost");
+		super.service(request, response);
+		System.out.println("Despues de ejecutar DoGet/DoPost");
+	}
+
+	/**
+	 * @see HttpServlet#HttpServlet()
+	 */
+	public MaterialesController() {
+		super();
+
+	}
+
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
+		doProcess(request, response);
+	}
+
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+		doProcess(request, response);
+	}
+
+	// Unimos las peticiones doGet y doPost,van a hacer lo mismo
+	private void doProcess(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
+
 		try {
-			String search = request.getParameter("search");
-			System.out.println("Filtro busqueda= "+ search);
-			
-		MaterialDAO dao = MaterialDAO.getInstance();
- 		materiales= dao.getAll();
- 		}
-		catch (Exception e) {
+
+			recogerParametros(request);
+			switch (op) {
+			case OP_MOSTRAR_FORMULARIO:
+				mostrarFormulario(request);
+				break;
+			case OP_ELIMINAR:
+				eliminar(request);
+				break;
+
+			case OP_BUSQUEDA:
+				buscar(request);
+				break;
+
+			case OP_GUARDAR:
+				guardar(request);
+				break;
+			default:
+				listar(request);
+				break;
+			}
+
+		} catch (Exception e) {
+			alert = new Alert();
 			e.printStackTrace();
-		}
-		finally {
+		} finally {
 			request.setAttribute("alert", alert);
-			request.setAttribute("materiales", materiales);
-			request.getRequestDispatcher("materiales/materiales.jsp").forward(request, response);
+
+			dispatcher.forward(request, response);
 		}
-		
+	}
+
+	private void listar(HttpServletRequest request) {
+
+		ArrayList<Material> materiales = new ArrayList<Material>();
+
+		materiales = dao.getAll();
+		request.setAttribute("materiales", materiales);
+		dispatcher = request.getRequestDispatcher(VIEW_INDEX);
+
+	}
+
+	private void guardar(HttpServletRequest request) {
+
+		if (id <= -1) {
+
+			
+			alert = new Alert("Nuevo producto agregado: " + nombre, Alert.TIPO_PRIMARY);
+		}
+
+	}
+
+	private void buscar(HttpServletRequest request) {
+		alert = new Alert("Busqueda para: " + search, Alert.TIPO_PRIMARY);
+		ArrayList<Material> materiales = new ArrayList<Material>();
+		materiales = dao.getAll();
+		request.setAttribute("materiales", materiales);
+		dispatcher = request.getRequestDispatcher(VIEW_INDEX);
+
+	}
+
+	private void eliminar(HttpServletRequest request) {
+
+		alert = new Alert("Eliminando: " + nombre, Alert.TIPO_PRIMARY);
 		
 		
 	}
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
-	 */
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		
-		doGet(request, response);
+	private void mostrarFormulario(HttpServletRequest request) {
+		Material material = new Material();
+		if (id > -1) {
+			// TODO recuperar de la BBDD que es un material que existe
+			alert = new Alert("Mostramos Detalle id:" + id + " Nombre:" + nombre + " Precio:" + precio, Alert.TIPO_WARNING);
+			material.setId(id);
+			material.setNombre(nombre);
+			material.setPrecio(precio);
+		}
+
+		else {
+			alert = new Alert("Nuevo Producto", Alert.TIPO_WARNING);
+		}
+		request.setAttribute("material", material);
+		dispatcher = request.getRequestDispatcher(VIEW_FORM);
+
+	}
+
+	private void recogerParametros(HttpServletRequest request) {
+
+		/**
+		 * Recogemos todos los datos enviados
+		 */
+
+		if (request.getParameter("op") != null) {
+
+			op = Integer.parseInt(request.getParameter("op"));
+		} else {
+
+			op = 0;
+		}
+
+		search = (request.getParameter("search") != null) ? request.getParameter("search") : "";
+
+		if (request.getParameter("id") != null) {
+
+			id = Integer.parseInt(request.getParameter("id"));
+		}
+
+		if (request.getParameter("nombre") != null) {
+
+			nombre = request.getParameter("id");
+		}
+
+		if (request.getParameter("precio") != null) {
+
+			precio = Float.parseFloat(request.getParameter("precio"));
+		}
+
 	}
 
 }

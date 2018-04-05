@@ -47,11 +47,14 @@ public class MaterialDAO {
 
 		try {
 
-			Class.forName("com.mysql.jdbc.Driver");
-			final String URL = "jdbc:mysql://192.168.0.42/spoty?user=alumno&password=alumno";
-			con = DriverManager.getConnection(URL);
+			/**Class.forName("com.mysql.jdbc.Driver");
+			final String URL = "jdbc:mysql://192.168.0.42/spoty?user=alumno&password=alumno";*/
+			con = ConnectionManager.getConnection();
 			String sql = "SELECT id, nombre, precio FROM material;";
-			
+
+			pst = con.prepareStatement(sql);
+			rs = pst.executeQuery();
+
 			String search ="Select id,nombre,precio FROM material where nombre like '%a%' ORDER BY id DESC LIMIT 500";
 
 			pst = con.prepareStatement(sql);
