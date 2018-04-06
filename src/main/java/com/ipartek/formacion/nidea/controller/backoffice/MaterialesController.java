@@ -1,7 +1,9 @@
 package com.ipartek.formacion.nidea.controller.backoffice;
 
+import java.io.Console;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Logger;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
@@ -27,6 +29,8 @@ public class MaterialesController extends HttpServlet {
 	private RequestDispatcher dispatcher;
 	private Alert alert;
 
+
+
 	public static final int OP_MOSTRAR_FORMULARIO = 1;
 	public static final int OP_BUSQUEDA = 14;
 	public static final int OP_ELIMINAR = 13;
@@ -42,7 +46,7 @@ public class MaterialesController extends HttpServlet {
 	private int id;
 	private String nombre;
 	private float precio;
-
+	Material material = new Material();
 	private MaterialDAO dao;
 
 	@Override
@@ -96,7 +100,7 @@ public class MaterialesController extends HttpServlet {
 	// Unimos las peticiones doGet y doPost,van a hacer lo mismo
 	private void doProcess(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
+		alert=null;
 		try {
 
 			recogerParametros(request);
@@ -118,7 +122,9 @@ public class MaterialesController extends HttpServlet {
 			default:
 				listar(request);
 				break;
+				
 			}
+			
 
 		} catch (Exception e) {
 			alert = new Alert();
@@ -141,13 +147,22 @@ public class MaterialesController extends HttpServlet {
 	}
 
 	private void guardar(HttpServletRequest request) {
-
-		if (id <= -1) {
-
-			
-			alert = new Alert("Nuevo producto agregado: " + nombre, Alert.TIPO_PRIMARY);
+		
+		material.setNombre(nombre);
+		material.setPrecio(precio);
+		material.setId(id);
+		
+		if (id == -1) {
+			alert = new Alert("Creado Nuevo Material ", Alert.TIPO_PRIMARY);
+			material.setNombre("Nuevo");
+		} else {
+			alert = new Alert("Modificado Material id: " + id, Alert.TIPO_PRIMARY);
+			material.setId(id);
+			material.setNombre("Modificado");
 		}
 
+		request.setAttribute("material", material);
+		dispatcher = request.getRequestDispatcher(VIEW_FORM);
 	}
 
 	private void buscar(HttpServletRequest request) {
@@ -161,13 +176,14 @@ public class MaterialesController extends HttpServlet {
 
 	private void eliminar(HttpServletRequest request) {
 
-		alert = new Alert("Eliminando: " + nombre, Alert.TIPO_PRIMARY);
-		
+		alert = new Alert("Eliminando: " + id, Alert.TIPO_PRIMARY);
+		listar(request);
 		
 	}
 
 	private void mostrarFormulario(HttpServletRequest request) {
-		Material material = new Material();
+
+	
 		if (id > -1) {
 			// TODO recuperar de la BBDD que es un material que existe
 			alert = new Alert("Mostramos Detalle id:" + id + " Nombre:" + nombre + " Precio:" + precio, Alert.TIPO_WARNING);
@@ -203,16 +219,25 @@ public class MaterialesController extends HttpServlet {
 		if (request.getParameter("id") != null) {
 
 			id = Integer.parseInt(request.getParameter("id"));
+		}else {
+			
+			id=-1;
 		}
 
 		if (request.getParameter("nombre") != null) {
 
-			nombre = request.getParameter("id");
+			nombre = request.getParameter("nombre");
+		}else {
+			
+			nombre="";
 		}
 
 		if (request.getParameter("precio") != null) {
 
 			precio = Float.parseFloat(request.getParameter("precio"));
+		}else {
+			
+			precio=0;
 		}
 
 	}

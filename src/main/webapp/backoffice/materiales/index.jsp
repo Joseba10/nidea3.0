@@ -12,7 +12,7 @@ Buscador
 <input type="text" name="search" required placeholder="Nombre del material">
 <input type="submit" value="Buscar">
 
-<button type="button" class="btn btn-success"><a href="backoffice/materiales/form.jsp">Ir a detalles</a></button>
+<button type="button" class="btn btn-success"><a href="backoffice/materiales?op=<%=MaterialesController.OP_MOSTRAR_FORMULARIO%>">Crear Nuevo Producto</a></button>
 
 </form>
 

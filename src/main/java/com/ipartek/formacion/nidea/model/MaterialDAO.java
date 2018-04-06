@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 import com.ipartek.formacion.nidea.pojo.Material;
 
-public class MaterialDAO {
+public class MaterialDAO<P> implements Persistible<Material>{
 
     private static MaterialDAO INSTANCE = null;
 
@@ -23,7 +23,6 @@ public class MaterialDAO {
         if (INSTANCE == null) {
         	INSTANCE= new MaterialDAO();
         }
-   
 
     }
     
@@ -92,5 +91,130 @@ public class MaterialDAO {
 
 		return lista;
 	}
+
+	@Override
+	public ArrayList<Material> getall() {
+	
+		return null;
+	}
+
+	@Override
+	public P getById(int id) {
+		boolean resul = false;
+		Connection con = null;
+		PreparedStatement pst = null;
+		try {
+
+			con = ConnectionManager.getConnection();
+			String sql = "SELECT `id` FROM `material` where `id`=?;";
+
+			pst = con.prepareStatement(sql);
+			pst.setInt(1, id);
+
+			int affetedRows = pst.executeUpdate();
+
+			if (affetedRows == 1) {
+				resul = true;
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+
+				if (pst != null) {
+					pst.close();
+				}
+
+				if (con != null) {
+					con.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return resul;
+	}
+
+	@Override
+	public boolean save(Material pojo) {
+		boolean resul = false;
+		Connection con = null;
+		PreparedStatement pst = null;
+		try {
+
+			con = ConnectionManager.getConnection();
+			String sql = "INSERT INTO `nidea`.`material` (`nombre`, `precio`) VALUES (?, ?);";
+
+			pst = con.prepareStatement(sql);
+			pst.setString(1, pojo.getNombre());
+			pst.setFloat(2, pojo.getPrecio());
+			
+			int affetedRows = pst.executeUpdate();
+
+			if (affetedRows == 1) {
+				resul = true;
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+
+				if (pst != null) {
+					pst.close();
+				}
+
+				if (con != null) {
+					con.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return resul;
+	
+	}
+
+	@Override
+	public boolean delete(int id) {
+		boolean resul = false;
+		Connection con = null;
+		PreparedStatement pst = null;
+		try {
+
+			con = ConnectionManager.getConnection();
+			String sql = "DELETE FROM `material` WHERE  `id`= ?;";
+
+			pst = con.prepareStatement(sql);
+			pst.setInt(1, id);
+
+			int affetedRows = pst.executeUpdate();
+
+			if (affetedRows == 1) {
+				resul = true;
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+
+				if (pst != null) {
+					pst.close();
+				}
+
+				if (con != null) {
+					con.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return resul;
+	}
+	
+
+	
 
 }

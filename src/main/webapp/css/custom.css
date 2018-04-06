@@ -28,23 +28,4 @@ button a{
 	color: white;
 }
 
-form#formcrud{
-	
 
-	border: 1px solid;
-	width: 400px;
-	
-}
-form#formcrud label{
-	margin-top: 9px;
-	text-align: center;
-}
-
-form#formcrud button#crear{
-	
-	width: 100%;
-}
-form#formcrud button#modificar,form#formcrud button#eliminar{
-	
-	width: 49.4%;
-}
