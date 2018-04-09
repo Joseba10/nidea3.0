@@ -1,6 +1,10 @@
 package com.ipartek.formacion.nidea.model;
 
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
+
+import javax.swing.table.TableRowSorter;
 
 import com.ipartek.formacion.nidea.pojo.Material;
 
@@ -11,7 +15,7 @@ public interface Persistible<P> {
 	 * @return Coleccion
 	 */
 
-	public ArrayList<P> getall();
+	public ArrayList<P> getAll();
 	
 	/**
 	 * OBTENEMOS EL DETALLE DE UN REGISTRO
@@ -40,4 +44,15 @@ public interface Persistible<P> {
 	
 	public boolean delete(int id);
 
+	
+	/**
+	 * Nos Mapea un Resultado de la Base de Datos a un Pojo
+	 * @param rs Resulset 1 registro de la Consulta
+	 * @return
+	 * 1 Pojo con los valores de Resulset o Null si no hay valores
+	 * @throws SQLException 
+	 */
+	
+	public P mapper(ResultSet rs) throws SQLException;
 }
+

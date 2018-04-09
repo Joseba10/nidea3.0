@@ -148,35 +148,51 @@ public class MaterialesController extends HttpServlet {
 
 	private void guardar(HttpServletRequest request) {
 		
+		Material material = new Material();
 		material.setNombre(nombre);
 		material.setPrecio(precio);
 		material.setId(id);
 		
-		if (id == -1) {
-			alert = new Alert("Creado Nuevo Material ", Alert.TIPO_PRIMARY);
-			material.setNombre("Nuevo");
-		} else {
-			alert = new Alert("Modificado Material id: " + id, Alert.TIPO_PRIMARY);
-			material.setId(id);
-			material.setNombre("Modificado");
-		}
+	if(dao.save(material)) {
+		
+		alert=new Alert("Material Guardado",Alert.TIPO_PRIMARY);
+		
+		
+	}else {
+		
+		alert=new Alert("Lo sentimos pero no hemos podido guardar el material",Alert.TIPO_WARNING);
+	}
+	
+	
 
 		request.setAttribute("material", material);
 		dispatcher = request.getRequestDispatcher(VIEW_FORM);
 	}
 
 	private void buscar(HttpServletRequest request) {
-		alert = new Alert("Busqueda para: " + search, Alert.TIPO_PRIMARY);
-		ArrayList<Material> materiales = new ArrayList<Material>();
-		materiales = dao.getAll();
-		request.setAttribute("materiales", materiales);
-		dispatcher = request.getRequestDispatcher(VIEW_INDEX);
+		Material material = new Material();
+		material.setId(id);
+		material.setNombre(nombre);
+		material.setPrecio(precio);
+
+		if (dao.save(material)) {
+
+			alert = new Alert("Material guardado", Alert.TIPO_PRIMARY);
+		} else {
+			alert = new Alert("Lo sentimos pero no hemos podido guardar el material", Alert.TIPO_WARNING);
+		}
+
+		request.setAttribute("material", material);
+		dispatcher = request.getRequestDispatcher(VIEW_FORM);
 
 	}
 
 	private void eliminar(HttpServletRequest request) {
-
-		alert = new Alert("Eliminando: " + id, Alert.TIPO_PRIMARY);
+		if (dao.delete(id)) {
+			alert = new Alert("Material Eliminado id " + id, Alert.TIPO_PRIMARY);
+		} else {
+			alert = new Alert("Error Eliminando, sentimos las molestias ", Alert.TIPO_WARNING);
+		}
 		listar(request);
 		
 	}
@@ -187,9 +203,8 @@ public class MaterialesController extends HttpServlet {
 		if (id > -1) {
 			// TODO recuperar de la BBDD que es un material que existe
 			alert = new Alert("Mostramos Detalle id:" + id + " Nombre:" + nombre + " Precio:" + precio, Alert.TIPO_WARNING);
-			material.setId(id);
-			material.setNombre(nombre);
-			material.setPrecio(precio);
+			material= dao.getById(id);
+		
 		}
 
 		else {
@@ -205,7 +220,8 @@ public class MaterialesController extends HttpServlet {
 		/**
 		 * Recogemos todos los datos enviados
 		 */
-
+		
+		
 		if (request.getParameter("op") != null) {
 
 			op = Integer.parseInt(request.getParameter("op"));

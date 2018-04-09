@@ -43,7 +43,7 @@ Buscador
 		<c:when test = "${(material.precio >= 25)}">
 	           <tr>
 					<td>${material.id} </td>
-				 	<td><a href="backoffice/materiales?id=${material.id}&nombre=${material.nombre}&precio=${material.precio}&op=<%=MaterialesController.OP_MOSTRAR_FORMULARIO%>">${material.nombre} </td>
+				 	<td><a href="backoffice/materiales?id=${material.id}&op=<%=MaterialesController.OP_MOSTRAR_FORMULARIO%>">${material.nombre} </td>
 				 	<td class="text-danger"> ${material.precio} &euro;</td>
 			 	</tr>
 		 </c:when>
@@ -51,14 +51,14 @@ Buscador
 		   <c:when test = "${material.precio >= 6}">
 			   <tr>
 				   	<td>${material.id} </td>
-				 	<td><a href="backoffice/materiales?id=${material.id}&nombre=${material.nombre}&precio=${material.precio}&op=<%=MaterialesController.OP_MOSTRAR_FORMULARIO%>">${material.nombre} </td> 
+				 	<td><a href="backoffice/materiales?id=${material.id}&op=<%=MaterialesController.OP_MOSTRAR_FORMULARIO%>">${material.nombre} </td> 
 				 	<td class="text-primary"> ${material.precio} &euro;</td>
 			 	 </tr>
 			</c:when>
 			<c:otherwise>
 				<tr>
 					<td>${material.id} </td>
-					 <td><a href="backoffice/materiales?id=${material.id}&nombre=${material.nombre}&precio=${material.precio}&op=<%=MaterialesController.OP_MOSTRAR_FORMULARIO%>">${material.nombre} </td>
+					 <td><a href="backoffice/materiales?id=${material.id}&op=<%=MaterialesController.OP_MOSTRAR_FORMULARIO%>">${material.nombre} </td>
 					 <td> ${material.precio} &euro;</td>
 				 </tr>
 				</c:otherwise>

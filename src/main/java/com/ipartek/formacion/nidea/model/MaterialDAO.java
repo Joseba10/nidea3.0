@@ -37,119 +37,90 @@ public class MaterialDAO<P> implements Persistible<Material>{
 	 * 
 	 * @return ArrayList<Material> si no existen registros new ArrayList<Material>()
 	 */
+	
+
+	@Override
 	public ArrayList<Material> getAll() {
-
 		ArrayList<Material> lista = new ArrayList<Material>();
-		Connection con = null;
-		PreparedStatement pst = null;
-		ResultSet rs = null;
-
-		try {
-
-			/**Class.forName("com.mysql.jdbc.Driver");
-			final String URL = "jdbc:mysql://192.168.0.42/spoty?user=alumno&password=alumno";*/
-			con = ConnectionManager.getConnection();
-			String sql = "SELECT id, nombre, precio FROM material;";
-
-			pst = con.prepareStatement(sql);
-			rs = pst.executeQuery();
-
-			String search ="Select id,nombre,precio FROM material where nombre like '%a%' ORDER BY id DESC LIMIT 500";
-
-			pst = con.prepareStatement(sql);
-			rs = pst.executeQuery();
-
+		String sql = "SELECT `id`, `nombre`, `precio` FROM `material` ORDER BY `id` DESC LIMIT 500";
+		try (Connection con = ConnectionManager.getConnection();
+				PreparedStatement pst = con.prepareStatement(sql);
+				ResultSet rs = pst.executeQuery();) {
 			Material m = null;
 			while (rs.next()) {
-				m = new Material();
-				m.setId(rs.getInt("id"));
-				m.setNombre(rs.getString("nombre"));
-				m.setPrecio(rs.getFloat("precio"));
+				m = mapper(rs);
 				lista.add(m);
 			}
 
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-
-			try {
-				if (rs != null) {
-					rs.close();
-				}
-
-				if (pst != null) {
-					pst.close();
-				}
-
-				if (con != null) {
-					con.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
 		}
-
 		return lista;
 	}
 
 	@Override
-	public ArrayList<Material> getall() {
-	
-		return null;
+	public Material getById(int id) {
+		
+		Material material = null;
+		String sql = "SELECT `id`,`nombre`,`precio` FROM `material` where `id`=?;"; //Interrogante: Valor que le pasas
+		
+		try (Connection con = ConnectionManager.getConnection();PreparedStatement pst=con.prepareStatement(sql);)
+		{
+			
+			pst.setInt(1, id); //Sustituimos el interrogante
+			
+				try (ResultSet rs=pst.executeQuery()){
+				
+						if(rs.next()) {//Avanza un paso en el cursor
+								
+							material=mapper(rs);
+					
+							}
+				
+				
+				
+			} catch (Exception e) {
+			
+			}
+			
+			
+		} catch (Exception e) {
+		e.printStackTrace();
+		}
+		
+		return material;
 	}
 
 	@Override
-	public P getById(int id) {
+		public boolean save(Material pojo) {
 		boolean resul = false;
-		Connection con = null;
-		PreparedStatement pst = null;
-		try {
 
-			con = ConnectionManager.getConnection();
-			String sql = "SELECT `id` FROM `material` where `id`=?;";
-
-			pst = con.prepareStatement(sql);
-			pst.setInt(1, id);
-
-			int affetedRows = pst.executeUpdate();
-
-			if (affetedRows == 1) {
-				resul = true;
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-
-				if (pst != null) {
-					pst.close();
-				}
-
-				if (con != null) {
-					con.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
+		if (pojo != null) {
+			if (pojo.getId() == -1) {
+				resul = crear(pojo);
+			} else {
+				resul = modificar(pojo);
 			}
 		}
+
 		return resul;
 	}
 
-	@Override
-	public boolean save(Material pojo) {
-		boolean resul = false;
-		Connection con = null;
-		PreparedStatement pst = null;
-		try {
 
-			con = ConnectionManager.getConnection();
-			String sql = "INSERT INTO `nidea`.`material` (`nombre`, `precio`) VALUES (?, ?);";
+	private boolean modificar(Material pojo) {
+	
 
-			pst = con.prepareStatement(sql);
+		boolean resul=false;
+		String sql = "UPDATE `material` SET `nombre`= ? , `precio`= ? WHERE  `id`= ?;";
+	
+		try(Connection con = ConnectionManager.getConnection();	PreparedStatement pst = con.prepareStatement(sql);) {
+
+
 			pst.setString(1, pojo.getNombre());
 			pst.setFloat(2, pojo.getPrecio());
+			pst.setInt(3, pojo.getId());
 			
+
 			int affetedRows = pst.executeUpdate();
 
 			if (affetedRows == 1) {
@@ -158,20 +129,46 @@ public class MaterialDAO<P> implements Persistible<Material>{
 
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			try {
+		} 
+		
+		return resul;
+	
+	
+	}
 
-				if (pst != null) {
-					pst.close();
-				}
+	private boolean crear(Material pojo) {
 
-				if (con != null) {
-					con.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
+		boolean resul=false;
+		String sql="INSERT INTO `material` (`nombre`, `precio`) VALUES ( ? , ? );";
+	
+		try(Connection con = ConnectionManager.getConnection();	PreparedStatement pst = con.prepareStatement(sql,PreparedStatement.RETURN_GENERATED_KEYS);) {
+
+
+			pst.setString(1, pojo.getNombre());
+			pst.setFloat(2, pojo.getPrecio());
+	
+			
+
+			int affetedRows = pst.executeUpdate();
+
+			if (affetedRows == 1)
+			{
+							 //Recuperar ID generado de forma automatica
+							
+						try(ResultSet rs=pst.getGeneratedKeys()){
+							
+							while(rs.next()) {
+							pojo.setId(rs.getInt(1));
+							resul = true;
+												}
+						}
 			}
-		}
+	
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		} 
+		
 		return resul;
 	
 	}
@@ -179,40 +176,32 @@ public class MaterialDAO<P> implements Persistible<Material>{
 	@Override
 	public boolean delete(int id) {
 		boolean resul = false;
-		Connection con = null;
-		PreparedStatement pst = null;
-		try {
-
-			con = ConnectionManager.getConnection();
-			String sql = "DELETE FROM `material` WHERE  `id`= ?;";
-
-			pst = con.prepareStatement(sql);
+		String sql = "DELETE FROM `material` WHERE  `id`= ?;";
+		try (Connection con = ConnectionManager.getConnection(); PreparedStatement pst = con.prepareStatement(sql);) {
 			pst.setInt(1, id);
-
-			int affetedRows = pst.executeUpdate();
-
-			if (affetedRows == 1) {
+			int affectedRows = pst.executeUpdate();
+			if (affectedRows == 1) {
 				resul = true;
 			}
-
 		} catch (Exception e) {
 			e.printStackTrace();
-		} finally {
-			try {
-
-				if (pst != null) {
-					pst.close();
-				}
-
-				if (con != null) {
-					con.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
 		}
 		return resul;
 	}
+
+	@Override
+	public Material mapper(ResultSet rs) throws SQLException {
+		Material  m=null;
+		
+		if(rs!=null) {
+		m= new Material();
+		m= new Material();
+		m.setId((rs.getInt("id")));
+		m.setNombre(rs.getString("nombre"));
+		m.setPrecio(rs.getFloat("precio"));
+	
+	}	return m;
+		}
 	
 
 	
