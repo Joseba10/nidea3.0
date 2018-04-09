@@ -153,37 +153,48 @@ public class MaterialesController extends HttpServlet {
 		material.setPrecio(precio);
 		material.setId(id);
 		
-	if(dao.save(material)) {
+		if(material.getNombre()=="")
 		
-		alert=new Alert("Material Guardado",Alert.TIPO_PRIMARY);
-		
-		
-	}else {
-		
-		alert=new Alert("Lo sentimos pero no hemos podido guardar el material",Alert.TIPO_WARNING);
-	}
-	
-	
+		{
+			alert=new Alert("Tienes que introducir un nombre",Alert.TIPO_DANGER);
+			
+		}
+			
+
+		else {
+			
+					if(material.getNombre().length()>45) {
+						
+						alert=new Alert("Maximo 45 palabras",Alert.TIPO_DANGER);
+					}
+					
+					else {
+						
+						
+						
+									if(dao.save(material)) {
+										
+										alert=new Alert("Material Guardado",Alert.TIPO_PRIMARY);
+										
+										}
+									else {
+										
+										alert=new Alert("Lo sentimos pero no hemos podido guardar el material,el material ya existe",Alert.TIPO_WARNING);
+										}
+						 		 
+						}
+				}
 
 		request.setAttribute("material", material);
 		dispatcher = request.getRequestDispatcher(VIEW_FORM);
 	}
 
 	private void buscar(HttpServletRequest request) {
-		Material material = new Material();
-		material.setId(id);
-		material.setNombre(nombre);
-		material.setPrecio(precio);
-
-		if (dao.save(material)) {
-
-			alert = new Alert("Material guardado", Alert.TIPO_PRIMARY);
-		} else {
-			alert = new Alert("Lo sentimos pero no hemos podido guardar el material", Alert.TIPO_WARNING);
-		}
-
-		request.setAttribute("material", material);
-		dispatcher = request.getRequestDispatcher(VIEW_FORM);
+		alert = new Alert("Busqueda para: " + search, Alert.TIPO_PRIMARY);
+		ArrayList<Material> materiales = new ArrayList<Material>();
+		materiales = dao.getAll();
+		request.setAttribute("materiales", materiales);
+		dispatcher = request.getRequestDispatcher(VIEW_INDEX);
 
 	}
 
@@ -194,7 +205,7 @@ public class MaterialesController extends HttpServlet {
 			alert = new Alert("Error Eliminando, sentimos las molestias ", Alert.TIPO_WARNING);
 		}
 		listar(request);
-		
+		dispatcher = request.getRequestDispatcher(VIEW_INDEX);
 	}
 
 	private void mostrarFormulario(HttpServletRequest request) {

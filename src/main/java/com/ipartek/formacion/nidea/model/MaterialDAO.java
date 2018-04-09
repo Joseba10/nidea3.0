@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import com.ipartek.formacion.nidea.controller.backoffice.MaterialesController;
 import com.ipartek.formacion.nidea.pojo.Material;
 
 public class MaterialDAO<P> implements Persistible<Material>{
@@ -95,7 +96,12 @@ public class MaterialDAO<P> implements Persistible<Material>{
 		public boolean save(Material pojo) {
 		boolean resul = false;
 
+		
+		
+		
 		if (pojo != null) {
+			
+		
 			if (pojo.getId() == -1) {
 				resul = crear(pojo);
 			} else {
@@ -116,7 +122,7 @@ public class MaterialDAO<P> implements Persistible<Material>{
 		try(Connection con = ConnectionManager.getConnection();	PreparedStatement pst = con.prepareStatement(sql);) {
 
 
-			pst.setString(1, pojo.getNombre());
+			pst.setString(1, pojo.getNombre().trim());
 			pst.setFloat(2, pojo.getPrecio());
 			pst.setInt(3, pojo.getId());
 			
@@ -144,7 +150,7 @@ public class MaterialDAO<P> implements Persistible<Material>{
 		try(Connection con = ConnectionManager.getConnection();	PreparedStatement pst = con.prepareStatement(sql,PreparedStatement.RETURN_GENERATED_KEYS);) {
 
 
-			pst.setString(1, pojo.getNombre());
+			pst.setString(1, pojo.getNombre().trim());
 			pst.setFloat(2, pojo.getPrecio());
 	
 			
