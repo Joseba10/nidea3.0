@@ -24,9 +24,16 @@ public class VehiculoElectrico extends Vehiculo {
 	}
 	
 	@Override
-	public void Arrancar() {
+	public void arrancar() {
 		
 		System.out.println("Pulsar el Boton de encendido");
 	}
+
+	public VehiculoElectrico(float potencia) {
+		this();//Cambiar Super por this()
+		this.potencia = potencia;
+	}
+
+
 	
 }
