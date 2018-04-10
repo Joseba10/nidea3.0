@@ -29,8 +29,6 @@ public class MaterialesController extends HttpServlet {
 	private RequestDispatcher dispatcher;
 	private Alert alert;
 
-
-
 	public static final int OP_MOSTRAR_FORMULARIO = 1;
 	public static final int OP_BUSQUEDA = 14;
 	public static final int OP_ELIMINAR = 13;
@@ -39,7 +37,7 @@ public class MaterialesController extends HttpServlet {
 	// PARAMETROS
 
 	// Parametros Comunes
-	private String search; // Buscador por Nombre del Material
+	private String nombreBuscar; // Buscador por Nombre del Material
 	private int op; // Operacion a realizar
 
 	// Parametros de Material
@@ -48,6 +46,7 @@ public class MaterialesController extends HttpServlet {
 	private float precio;
 	Material material = new Material();
 	private MaterialDAO dao;
+	
 
 	@Override
 	public void init(ServletConfig config) throws ServletException {
@@ -100,7 +99,7 @@ public class MaterialesController extends HttpServlet {
 	// Unimos las peticiones doGet y doPost,van a hacer lo mismo
 	private void doProcess(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		alert=null;
+		alert = null;
 		try {
 
 			recogerParametros(request);
@@ -122,9 +121,8 @@ public class MaterialesController extends HttpServlet {
 			default:
 				listar(request);
 				break;
-				
+
 			}
-			
 
 		} catch (Exception e) {
 			alert = new Alert();
@@ -147,52 +145,86 @@ public class MaterialesController extends HttpServlet {
 	}
 
 	private void guardar(HttpServletRequest request) {
-		
+
 		Material material = new Material();
-		material.setNombre(nombre);
-		material.setPrecio(precio);
-		material.setId(id);
 		
-		if(material.getNombre()=="")
+	
+	
 		
-		{
-			alert=new Alert("Tienes que introducir un nombre",Alert.TIPO_DANGER);
+		try {
+			material.setNombre(nombre);
+			material.setId(id);
 			
-		}
+			if(request.getParameter("precio")!=null) {
+				
+				precio=Float.parseFloat(request.getParameter("precio"));
+				material.setPrecio(precio);
+				
+			}
+			
+		
+			
+			if (request.getParameter("precio") != null) {
+				precio = Float.parseFloat(request.getParameter("precio"));
+			} else {
+				precio = 0;
+			}
 			
 
-		else {
-			
-					if(material.getNombre().length()>45) {
-						
-						alert=new Alert("Maximo 45 palabras",Alert.TIPO_DANGER);
-					}
+			if (material.getNombre() == ""){
+				alert = new Alert("Tienes que introducir un nombre", Alert.TIPO_DANGER);
+				
+			}
+			else {
+				//TODO hacer que el precio no este en blanco y solo acepte numeros
+					 
+		
+							if (material.getNombre().length() > 45) {
+				
+								alert = new Alert("Maximo 45 palabras", Alert.TIPO_DANGER);
+							}
+				
+							else {
+								if (material.getPrecio() < 0) {
+									alert = new Alert("El precio debe ser mayor que 0", Alert.TIPO_DANGER);
+								} else {
+									
+										if (dao.save(material)) {
 					
-					else {
-						
-						
-						
-									if(dao.save(material)) {
-										
-										alert=new Alert("Material Guardado",Alert.TIPO_PRIMARY);
-										
+											alert = new Alert("Material Guardado", Alert.TIPO_PRIMARY);
+					
+										} else {
+					
+													alert = new Alert("Lo sentimos pero no hemos podido guardar el material,el material ya existe",
+													Alert.TIPO_WARNING);
+												}
 										}
-									else {
-										
-										alert=new Alert("Lo sentimos pero no hemos podido guardar el material,el material ya existe",Alert.TIPO_WARNING);
-										}
-						 		 
-						}
-				}
+								}
+							
+					}
+		} catch (NumberFormatException e) {
+				
+			e.printStackTrace();
+			alert = new Alert("No es un precio correcto");
+				
+		}
+		 catch (NullPointerException e) {
+			e.printStackTrace();
+			alert = new Alert("El precio no puede estar vacio");
+					
+			}
+		
+	
+
 
 		request.setAttribute("material", material);
 		dispatcher = request.getRequestDispatcher(VIEW_FORM);
 	}
 
 	private void buscar(HttpServletRequest request) {
-		alert = new Alert("Busqueda para: " + search, Alert.TIPO_PRIMARY);
+		alert = new Alert("Busqueda para: " + nombreBuscar, Alert.TIPO_PRIMARY);
 		ArrayList<Material> materiales = new ArrayList<Material>();
-		materiales = dao.getAll();
+		materiales = dao.search(nombreBuscar);
 		request.setAttribute("materiales", materiales);
 		dispatcher = request.getRequestDispatcher(VIEW_INDEX);
 
@@ -210,7 +242,6 @@ public class MaterialesController extends HttpServlet {
 
 	private void mostrarFormulario(HttpServletRequest request) {
 
-	
 		Material material = new Material();
 		if (id > -1) {
 			material = dao.getById(id);
@@ -227,8 +258,6 @@ public class MaterialesController extends HttpServlet {
 		/**
 		 * Recogemos todos los datos enviados
 		 */
-		
-		
 
 		if (request.getParameter("op") != null) {
 			op = Integer.parseInt(request.getParameter("op"));
@@ -236,7 +265,7 @@ public class MaterialesController extends HttpServlet {
 			op = 0;
 		}
 
-		search = (request.getParameter("search") != null) ? request.getParameter("search") : "";
+		nombreBuscar = (request.getParameter("search") != null) ? request.getParameter("search") : "";
 
 		if (request.getParameter("id") != null) {
 			id = Integer.parseInt(request.getParameter("id"));
@@ -250,11 +279,7 @@ public class MaterialesController extends HttpServlet {
 			nombre = "";
 		}
 
-		if (request.getParameter("precio") != null) {
-			precio = Float.parseFloat(request.getParameter("precio"));
-		} else {
-			precio = 0;
-		}
+	
 
 	}
 

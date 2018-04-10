@@ -1,13 +1,11 @@
 package com.ipartek.formacion.nidea.model;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
-import com.ipartek.formacion.nidea.controller.backoffice.MaterialesController;
 import com.ipartek.formacion.nidea.pojo.Material;
 
 public class MaterialDAO<P> implements Persistible<Material>{
@@ -39,6 +37,32 @@ public class MaterialDAO<P> implements Persistible<Material>{
 	 * @return ArrayList<Material> si no existen registros new ArrayList<Material>()
 	 */
 	
+    public ArrayList<Material> search(String nombreBuscar) {
+		ArrayList<Material> lista = new ArrayList<Material>();
+		String sql = "SELECT `id`, `nombre`, `precio` FROM `material` WHERE `nombre` LIKE ?  ORDER BY `id` DESC LIMIT 500;";
+		
+		try (Connection con = ConnectionManager.getConnection();PreparedStatement pst = con.prepareStatement(sql);) {
+			
+					pst.setString(1, "%"+nombreBuscar+"%");
+					try(ResultSet rs = pst.executeQuery();){
+						Material m = null;
+						while (rs.next()) {
+							m = mapper(rs);
+							lista.add(m);
+						}
+					}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	return lista;
+	
+}
+    
+    
+    
+    
+    
 
 	@Override
 	public ArrayList<Material> getAll() {
@@ -83,6 +107,7 @@ public class MaterialDAO<P> implements Persistible<Material>{
 			} catch (Exception e) {
 			
 			}
+			
 			
 			
 		} catch (Exception e) {
@@ -159,8 +184,12 @@ public class MaterialDAO<P> implements Persistible<Material>{
 
 			if (affetedRows == 1)
 			{
-							 //Recuperar ID generado de forma automatica
+				
+				
+				
+				//Recuperar ID generado de forma automatica
 							
+				
 						try(ResultSet rs=pst.getGeneratedKeys()){
 							
 							while(rs.next()) {
