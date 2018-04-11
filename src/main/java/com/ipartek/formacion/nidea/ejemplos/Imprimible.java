@@ -1,6 +1,6 @@
 package com.ipartek.formacion.nidea.ejemplos;
 
-public interface Imprimible {
+public interface Imprimible extends Yoquese,Queseyo{
 
 	void imprimible();
 	}
