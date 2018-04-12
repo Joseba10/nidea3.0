@@ -4,7 +4,7 @@
   <welcome-file-list>
     <welcome-file>login.jsp</welcome-file>
   </welcome-file-list>
-    <resource-ref>
+  <resource-ref>
     <description>MySQL Datasource example</description>
     <res-ref-name>jdbc/mydb</res-ref-name>
     <res-type>javax.sql.DataSource</res-type>

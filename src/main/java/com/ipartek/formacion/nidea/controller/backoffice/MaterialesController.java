@@ -1,12 +1,12 @@
 package com.ipartek.formacion.nidea.controller.backoffice;
 
-import java.io.Console;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Logger;
+import java.util.HashMap;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -46,7 +46,6 @@ public class MaterialesController extends HttpServlet {
 	private float precio;
 	Material material = new Material();
 	private MaterialDAO dao;
-	
 
 	@Override
 	public void init(ServletConfig config) throws ServletException {
@@ -100,6 +99,19 @@ public class MaterialesController extends HttpServlet {
 	private void doProcess(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		alert = null;
+
+		ServletContext context = request.getServletContext();
+		//
+		HashMap<Integer, String> usuarios = (HashMap<Integer, String>) context.getAttribute("usuarios_conectados");
+
+		if (usuarios == null) {
+
+			usuarios = new HashMap<Integer, String>();
+
+			usuarios.put(3, "nombreParameter");
+			context.setAttribute("usuarios_conectados", usuarios);
+		}
+
 		try {
 
 			recogerParametros(request);
@@ -147,75 +159,64 @@ public class MaterialesController extends HttpServlet {
 	private void guardar(HttpServletRequest request) {
 
 		Material material = new Material();
-		
-	
-	
-		
+
 		try {
 			material.setNombre(nombre);
 			material.setId(id);
-			
-			if(request.getParameter("precio")!=null) {
-				
-				precio=Float.parseFloat(request.getParameter("precio"));
+
+			if (request.getParameter("precio") != null) {
+
+				precio = Float.parseFloat(request.getParameter("precio"));
 				material.setPrecio(precio);
-				
+
 			}
-			
-		
-			
+
 			if (request.getParameter("precio") != null) {
 				precio = Float.parseFloat(request.getParameter("precio"));
 			} else {
 				precio = 0;
 			}
-			
 
-			if (material.getNombre() == ""){
+			if (material.getNombre() == "") {
 				alert = new Alert("Tienes que introducir un nombre", Alert.TIPO_DANGER);
-				
-			}
-			else {
-				//TODO hacer que el precio no este en blanco y solo acepte numeros
-					 
-		
-							if (material.getNombre().length() > 45) {
-				
-								alert = new Alert("Maximo 45 palabras", Alert.TIPO_DANGER);
-							}
-				
-							else {
-								if (material.getPrecio() < 0) {
-									alert = new Alert("El precio debe ser mayor que 0", Alert.TIPO_DANGER);
-								} else {
-									
-										if (dao.save(material)) {
-					
-											alert = new Alert("Material Guardado", Alert.TIPO_PRIMARY);
-					
-										} else {
-					
-													alert = new Alert("Lo sentimos pero no hemos podido guardar el material,el material ya existe",
-													Alert.TIPO_WARNING);
-												}
-										}
-								}
-							
+
+			} else {
+				// TODO hacer que el precio no este en blanco y solo acepte numeros
+
+				if (material.getNombre().length() > 45) {
+
+					alert = new Alert("Maximo 45 palabras", Alert.TIPO_DANGER);
+				}
+
+				else {
+					if (material.getPrecio() < 0) {
+						alert = new Alert("El precio debe ser mayor que 0", Alert.TIPO_DANGER);
+					} else {
+
+						if (dao.save(material)) {
+
+							alert = new Alert("Material Guardado", Alert.TIPO_PRIMARY);
+
+						} else {
+
+							alert = new Alert(
+									"Lo sentimos pero no hemos podido guardar el material,el material ya existe",
+									Alert.TIPO_WARNING);
+						}
 					}
+				}
+
+			}
 		} catch (NumberFormatException e) {
-				
+
 			e.printStackTrace();
 			alert = new Alert("No es un precio correcto");
-				
-		}
-		 catch (NullPointerException e) {
+
+		} catch (NullPointerException e) {
 			e.printStackTrace();
 			alert = new Alert("El precio no puede estar vacio");
-					
-			}
-		
-	
 
+		}
 
 		request.setAttribute("material", material);
 		dispatcher = request.getRequestDispatcher(VIEW_FORM);
@@ -278,8 +279,6 @@ public class MaterialesController extends HttpServlet {
 		} else {
 			nombre = "";
 		}
-
-	
 
 	}
 

@@ -35,5 +35,7 @@ public class VehiculoElectrico extends Vehiculo {
 	}
 
 
+
+
 	
 }

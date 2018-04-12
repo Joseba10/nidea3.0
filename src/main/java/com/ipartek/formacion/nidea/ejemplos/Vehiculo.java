@@ -1,10 +1,19 @@
 package com.ipartek.formacion.nidea.ejemplos;
 
-public abstract class Vehiculo {
+public abstract class Vehiculo implements Ordenable{
 
 	private int puertas;
 	private String color;
+	private int radio;
 	
+	public int getRadio() {
+		return radio;
+	}
+
+	public void setRadio(int radio) {
+		this.radio = radio;
+	}
+
 	//Constructor
 	public Vehiculo() {
 		super(); //java.lang.Objetc
@@ -38,5 +47,11 @@ public abstract class Vehiculo {
 
 	public void encenderLuces() {
 		System.out.println("Luces Encendidas");
+	}
+	
+
+	public int getValor() {
+		
+		return this.puertas;
 	}
 }

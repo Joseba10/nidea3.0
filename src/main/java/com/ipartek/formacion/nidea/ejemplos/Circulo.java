@@ -1,11 +1,19 @@
 package com.ipartek.formacion.nidea.ejemplos;
 
-public class Circulo extends ObjetoGrafico{
+public class Circulo extends ObjetoGrafico implements Ordenable{
+
+	public int getRadio() {
+		return radio;
+	}
+
+	public void setRadio(int radio) {
+		this.radio = radio;
+	}
 
 	int radio;
 	@Override
 	void dibujar() {
-		// TODO Auto-generated method stub
+	
 		
 	}
 	
@@ -16,6 +24,12 @@ public class Circulo extends ObjetoGrafico{
 	public Circulo(){
 		super();
 		
+	}
+
+	@Override
+	public int getValor() {
+	
+		return 0;
 	}
 
 	

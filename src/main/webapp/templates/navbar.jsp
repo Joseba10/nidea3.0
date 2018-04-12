@@ -17,6 +17,7 @@
          
          <a class="btn btn-outline-primary" href="materiales">Materiales</a>
           <a class="btn btn-outline-primary" href="login">Login</a>
+            <a class="btn btn-outline-primary" href="nuevologin">NuevoLogin</a>
       </c:if>
       
       
