@@ -41,6 +41,8 @@ public class HtmlParserJSoup {
 		 */
 
 		// Donde estoy,pagina de lista de productos
+		
+		//Muestro el contenido,en este caso del titulo que esta en H1
 		System.out.println(doc.getElementsByTag("h1").get(0).text());
 
 		Elements button = doc.getElementsByTag("button");
@@ -58,12 +60,12 @@ public class HtmlParserJSoup {
 
 			// Muestro para ver que la url esta bien formada
 			System.out.println(direccioncompleta);
+			
+			// Muestro el valor del boton de donde estoy,para saber si es, el boton que busco
 			Elements botonvistaproductos = doc.getElementsByTag("form");
 			
 				System.out.println(botonvistaproductos.text());
 
-			
-			
 			/*
 			 * Me conecto a esa direccion url y le paso unos parametros,en este caso para el
 			 * formulario
