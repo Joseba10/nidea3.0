@@ -76,6 +76,12 @@
 		   <version>2.2.4</version>
 		   			<scope>test</scope>
 		</dependency>
+		<!-- Parsear informacion -->
+		<dependency>
+    <groupId>org.jsoup</groupId>
+    <artifactId>jsoup</artifactId>
+    <version>1.11.2</version>
+</dependency>
 
 
 	</dependencies>
