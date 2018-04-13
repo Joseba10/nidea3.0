@@ -108,7 +108,6 @@ public class MaterialesController extends HttpServlet {
 
 			usuarios = new HashMap<Integer, String>();
 
-			usuarios.put(3, "nombreParameter");
 			context.setAttribute("usuarios_conectados", usuarios);
 		}
 
