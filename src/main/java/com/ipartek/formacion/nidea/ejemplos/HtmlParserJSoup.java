@@ -26,22 +26,64 @@ public class HtmlParserJSoup {
 		 * }
 		 */
 
-		// String url = "http://192.168.0.15:8080/nidea/login";
-
 		String url = "http://localhost:8080/nidea/login";
-		String url2 = "http://localhost:8080/backoffice/materiales";
-		String url3 = "http://localhost:8080/backoffice/materiales?op=1";
 
+		// Entramos en la primera pagina mandando unos parametros al login para que
+		// podamos acceder automaticamente
 		Connection.Response response = Jsoup.connect(url).method(Connection.Method.POST).data("usuario", "admin")
 				.data("password", "admin").execute();
 
+		// Enviamos los datos
 		Document doc = response.parse();
+		/*
+		 * Para verificar que estamos en la pagina adecuada cogemos los datos de una
+		 * etiqueta existente
+		 */
+
+		// Donde estoy,pagina de lista de productos
 		System.out.println(doc.getElementsByTag("h1").get(0).text());
 
-		Element div = doc.getElementById("form-group");
-		Elements crear = doc.getElementsByTag("a");
-		Elements botton = doc.getElementsByTag("button");
+		Elements button = doc.getElementsByTag("button");
+
+		// Accedo a las propiedades del boton
+		for (Element ancla : button) {
+			Elements a = ancla.getElementsByTag("a");
+			String url2 = a.attr("href");
+
+			// Paso por pantalla la url donde va a apuntar
+			System.out.println(url2);
+
+			// Añado el restante de la url para que pueda navegar
+			String direccioncompleta = "http://localhost:8080/nidea/" + url2;
+
+			// Muestro para ver que la url esta bien formada
+			System.out.println(direccioncompleta);
+			Elements anclas = doc.getElementsByTag("form");
+			
+				System.out.println(anclas.text());
+
+			
+			
+			/*
+			 * Me conecto a esa direccion url y le paso unos parametros,en este caso para el
+			 * formulario
+			 */
+			Connection.Response response1 = Jsoup.connect(direccioncompleta).method(Connection.Method.POST)
+					.data("nombre", "mesa").data("precio", "14").execute();
+
+			Document doc1 = response1.parse();
+			/*
+			 * Verificamos que estamos en la pagina correcta cogiendo un atributo y leyendo
+			 * su contenido En este caso el boton que es lo que usaremos como referencia
+			 */
+
+			Elements form = doc1.getElementsByTag("form");
+			for (Element boton2 : form) {
+				Element datos = boton2.tagName("button");
+				System.out.println(datos.text());
+
+			}
+		}
 
 	}
-
 }
