@@ -46,21 +46,21 @@ public class HtmlParserJSoup {
 		Elements button = doc.getElementsByTag("button");
 
 		// Accedo a las propiedades del boton
-		for (Element ancla : button) {
-			Elements a = ancla.getElementsByTag("a");
-			String url2 = a.attr("href");
+		for (Element contenidoboton : button) {
+			Elements a = contenidoboton.getElementsByTag("a");
+			String urldestino = a.attr("href");
 
 			// Paso por pantalla la url donde va a apuntar
-			System.out.println(url2);
+			System.out.println(urldestino);
 
 			// Añado el restante de la url para que pueda navegar
-			String direccioncompleta = "http://localhost:8080/nidea/" + url2;
+			String direccioncompleta = "http://localhost:8080/nidea/" + urldestino;
 
 			// Muestro para ver que la url esta bien formada
 			System.out.println(direccioncompleta);
-			Elements anclas = doc.getElementsByTag("form");
+			Elements botonvistaproductos = doc.getElementsByTag("form");
 			
-				System.out.println(anclas.text());
+				System.out.println(botonvistaproductos.text());
 
 			
 			
@@ -77,10 +77,10 @@ public class HtmlParserJSoup {
 			 * su contenido En este caso el boton que es lo que usaremos como referencia
 			 */
 
-			Elements form = doc1.getElementsByTag("form");
-			for (Element boton2 : form) {
-				Element datos = boton2.tagName("button");
-				System.out.println(datos.text());
+			Elements botoncrearproductos = doc1.getElementsByTag("form");
+			for (Element boton : botoncrearproductos) {
+				Element datosboton = boton.tagName("button");
+				System.out.println(datosboton.text());
 
 			}
 		}
