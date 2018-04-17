@@ -11,7 +11,6 @@ import javax.servlet.http.HttpSession;
 
 import com.ipartek.formacion.nidea.model.MaterialDAO;
 import com.ipartek.formacion.nidea.pojo.Alert;
-import com.ipartek.formacion.nidea.pojo.Usuario;
 
 /**
  * Servlet implementation class LoginController
@@ -27,7 +26,6 @@ public class LoginController extends HttpServlet {
 	private static final String SqlUser = "Select usuario from usuario where usuario=?";
 	private static final String SqlPass = "Select password from usuario where password=?";
 	private static final String SqlRol = "Select rol_id from usuario where rol_id=?";
-	boolean isAdmin = Usuario.getIdroles() == 1;
 	private static final int SESSION_EXPIRATION = -1; // 1 min
 
 	/**
@@ -48,22 +46,9 @@ public class LoginController extends HttpServlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 
+		String usuario = request.getParameter("usuario");
+		String password = request.getParameter("password");
 		try {
-
-			if (!isAdmin) {
-
-				(req.getRequestDispatcher("/loginserver")).forward(request, response);
-			}
-
-			else {
-
-				chain.doFilter(request, response);
-
-			}
-
-			String usuario = request.getParameter("usuario");
-			String password = request.getParameter("password");
-			boolean isAdmin = usuario.getIdroles() == 1;
 
 			if (SqlUser.equalsIgnoreCase(usuario) && SqlPass.equals(password)) {
 

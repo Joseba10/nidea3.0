@@ -4,21 +4,13 @@ public class Usuario {
 
 	private int id;
 	private String nombre;
-	private static int idroles;
+	private Rol rol;
 
 	public Usuario(int id, String nombre, int idroles) {
 		super();
 		this.id = id;
 		this.nombre = nombre;
-		this.idroles = idroles;
-	}
 
-	public static int getIdroles() {
-		return idroles;
-	}
-
-	public void setIdroles(int idroles) {
-		this.idroles = idroles;
 	}
 
 	public Usuario(int id, String nombre) {
@@ -51,7 +43,15 @@ public class Usuario {
 
 	@Override
 	public String toString() {
-		return "Usuario [id=" + id + ", nombre=" + nombre + ", idroles=" + idroles + "]";
+		return "Usuario [id=" + id + ", nombre=" + nombre + "]";
+	}
+
+	public Rol getRol() {
+		return rol;
+	}
+
+	public void setRol(Rol rol) {
+		this.rol = rol;
 	}
 
 }
