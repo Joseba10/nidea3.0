@@ -45,6 +45,7 @@ Buscador
 					<td>${material.id} </td>
 				 	<td><a href="backoffice/materiales?id=${material.id}&op=<%=MaterialesController.OP_MOSTRAR_FORMULARIO%>">${material.nombre} </td>
 				 	<td class="text-danger"> ${material.precio} &euro;</td>
+				 	<td class="text-danger"> ${material.usuario.nombre} &euro;</td>
 			 	</tr>
 		 </c:when>
        

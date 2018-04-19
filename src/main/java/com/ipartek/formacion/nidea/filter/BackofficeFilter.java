@@ -15,49 +15,51 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import com.ipartek.formacion.nidea.pojo.Usuario;
+
 /**
  * Servlet Filter implementation class BackofficeFilter
  */
-@WebFilter(dispatcherTypes = {
-				DispatcherType.REQUEST, 
-				DispatcherType.FORWARD, 
-				DispatcherType.INCLUDE, 
-				DispatcherType.ERROR
-		}
-					, description = "Dejar pasar solo a los usuarios Logeados", urlPatterns = { "/backoffice/*" })
+@WebFilter(dispatcherTypes = { DispatcherType.REQUEST, DispatcherType.FORWARD, DispatcherType.INCLUDE,
+		DispatcherType.ERROR }, description = "Dejar pasar solo a los usuarios Logeados", urlPatterns = {
+				"/backoffice/*" })
 public class BackofficeFilter implements Filter {
 
 	public void destroy() {
-			
-			System.out.println("BackofficeFilter Destroy");
+
+		System.out.println("BackofficeFilter Destroy");
 	}
 
 	/**
 	 * @see Filter#doFilter(ServletRequest, ServletResponse, FilterChain)
 	 */
-	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-		
-		HttpServletRequest req= (HttpServletRequest)request;
-		HttpServletResponse res= (HttpServletResponse)response;
-		
+	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+			throws IOException, ServletException {
+
+		HttpServletRequest req = (HttpServletRequest) request;
+		HttpServletResponse res = (HttpServletResponse) response;
+
 		HttpSession session = req.getSession();
-		
-		if (null!=session.getAttribute("usuario")) {
-		
-			chain.doFilter(request, response); //Continua
+		Usuario usuario = (Usuario) session.getAttribute("usuario");
+
+		if (null != usuario && usuario.getRol().getId() == Usuario.ROL_ADMIN) {
+
+			chain.doFilter(request, response); // Continua
 		}
+
 		else {
-			
+
 			informacionPeticion(req);
-			
+
 			res.sendRedirect(req.getContextPath() + "/login");
 		}
 	}
-/**
- * Mostramos por pantalla toda la informacion del Usuario == Request
- */
+
+	/**
+	 * Mostramos por pantalla toda la informacion del Usuario == Request
+	 */
 	private void informacionPeticion(HttpServletRequest req) {
-	
+
 		System.out.println("*************** ACCESO NO PERMITIDO *************************");
 		System.out.println("IP= " + req.getLocalAddr());
 		System.out.println("PORT= " + req.getRemotePort());

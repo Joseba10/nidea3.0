@@ -6,9 +6,66 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import com.ipartek.formacion.nidea.pojo.Rol;
 import com.ipartek.formacion.nidea.pojo.Usuario;
 
-public class UsuarioDAO<P> implements Persistible<P> {
+public class UsuarioDAO implements Persistible<Usuario> {
+
+	private static UsuarioDAO INSTANCE = null;
+
+	// Private constructor para que nose pueda hacer new y crear N instancias
+	private UsuarioDAO() {
+	}
+
+	// creador sincronizado para protegerse de posibles problemas multi-hilo
+	// otra prueba para evitar instanciación múltiple
+
+	public synchronized static void CreateInstance() {
+		if (INSTANCE == null) {
+			INSTANCE = new UsuarioDAO();
+		}
+
+	}
+
+	public static UsuarioDAO getInstance() {
+		if (INSTANCE == null) {
+			CreateInstance();
+		}
+		return INSTANCE;
+	}
+
+	/**
+	 * Buscamos un usuario por nombre y password
+	 * 
+	 * @param nombre
+	 *            String nombre del Usuario
+	 * 
+	 * @param password
+	 *            String password del Usuario
+	 * 
+	 * @return Usuario si existe,null si no lo encuentra
+	 * @throws SQLException
+	 */
+
+	public Usuario check(String nombre, String pass) throws SQLException {
+
+		Usuario resul = null;
+		String sql = "SELECT u.id as 'usuario_id', u.nombre as 'usuario_nombre', u.password, r.id as 'rol_id', r.nombre as 'rol_nombre' "
+				+ "FROM usuario as u, rol as r " + "WHERE u.id_rol = r.id AND u.nombre=? and u.password = ?;";
+		try (Connection con = ConnectionManager.getConnection(); PreparedStatement pst = con.prepareStatement(sql);) {
+			pst.setString(1, nombre);
+			pst.setString(2, pass);
+			try (ResultSet rs = pst.executeQuery()) {
+				while (rs.next()) {
+					resul = mapper(rs);
+				}
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return resul;
+	}
 
 	public ArrayList<Usuario> search(String nombreBuscar) {
 		ArrayList<Usuario> lista = new ArrayList<Usuario>();
@@ -33,7 +90,7 @@ public class UsuarioDAO<P> implements Persistible<P> {
 	}
 
 	@Override
-	public ArrayList<P> getAll() {
+	public ArrayList<Usuario> getAll() {
 		ArrayList<Usuario> lista = new ArrayList<Usuario>();
 		String sql = "SELECT `id`, `nombre`, `precio` FROM `material`,`usuario` ORDER BY `id` DESC LIMIT 500";
 		try (Connection con = ConnectionManager.getConnection();
@@ -48,11 +105,11 @@ public class UsuarioDAO<P> implements Persistible<P> {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		return (ArrayList<P>) lista;
+		return (ArrayList<Usuario>) lista;
 	}
 
 	@Override
-	public P getById(int id) {
+	public Usuario getById(int id) {
 		Usuario usuario = null;
 		String sql = "SELECT `id`,`nombre`,`precio` FROM `material`,`usuario` where `id`=?;"; // Interrogante: Valor que
 																								// le pasas
@@ -77,11 +134,11 @@ public class UsuarioDAO<P> implements Persistible<P> {
 			e.printStackTrace();
 		}
 
-		return (P) usuario;
+		return usuario;
 	}
 
 	@Override
-	public boolean save(P pojo) {
+	public boolean save(Usuario pojo) {
 		boolean resul = false;
 
 		// sanear el nombre
@@ -118,17 +175,19 @@ public class UsuarioDAO<P> implements Persistible<P> {
 	}
 
 	@Override
-	public P mapper(ResultSet rs) throws SQLException {
-		Usuario m = null;
+	public Usuario mapper(ResultSet rs) throws SQLException {
+		Usuario u = new Usuario();
+		u.setId(rs.getInt("usuario_id"));
+		u.setNombre(rs.getString("usuario_nombre"));
+		u.setPass(rs.getString("password"));
 
-		if (rs != null) {
-			m = new Usuario();
-			m.setId((rs.getInt("id")));
-			m.setNombre(rs.getString("nombre"));
-			// m.setPrecio(rs.getFloat("precio"));
+		// Rol del usuario
+		Rol rol = new Rol();
+		rol.setId(rs.getInt("rol_id"));
+		rol.setNombre(rs.getString("rol_nombre"));
+		u.setRol(rol);
 
-		}
-		return (P) m;
+		return u;
 	}
 
 }

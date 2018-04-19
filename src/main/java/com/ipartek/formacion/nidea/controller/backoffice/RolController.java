@@ -2,31 +2,28 @@ package com.ipartek.formacion.nidea.controller.backoffice;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.ipartek.formacion.nidea.model.MaterialDAO;
-import com.ipartek.formacion.nidea.model.UsuarioDAO;
+import com.ipartek.formacion.nidea.model.RolDAO;
 import com.ipartek.formacion.nidea.pojo.Alert;
-import com.ipartek.formacion.nidea.pojo.Material;
+import com.ipartek.formacion.nidea.pojo.Rol;
 
 /**
- * Servlet implementation class MaterialesController
+ * Servlet implementation class RolController
  */
-@WebServlet("/backoffice/materiales")
-public class MaterialesController extends HttpServlet {
+@WebServlet("/backoffice/rol")
+public class RolController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	private static final String VIEW_INDEX = "materiales/index.jsp";
-	private static final String VIEW_FORM = "materiales/form.jsp";
+	private static final String VIEW_INDEX = "roles/index.jsp";
+	private static final String VIEW_FORM = "roles/form.jsp";
 	private RequestDispatcher dispatcher;
 	private Alert alert;
 
@@ -38,16 +35,14 @@ public class MaterialesController extends HttpServlet {
 	// PARAMETROS
 
 	// Parametros Comunes
-	private String nombreBuscar; // Buscador por Nombre del Material
+	private String nombreBuscar; // Buscador por Nombre del Rol
 	private int op; // Operacion a realizar
 
-	// Parametros de Material
+	// Parametros de ROL
 	private int id;
 	private String nombre;
-	private float precio;
-	Material material = new Material();
-	private MaterialDAO daomaterial;
-	private UsuarioDAO usuariodao;
+	Rol rol = new Rol();
+	private RolDAO dao;
 
 	@Override
 	public void init(ServletConfig config) throws ServletException {
@@ -56,8 +51,7 @@ public class MaterialesController extends HttpServlet {
 		 * Se ejecuta una sola vez con la primera ejecucion que se realiza
 		 */
 		super.init(config);
-		daomaterial = MaterialDAO.getInstance();
-
+		dao = RolDAO.getInstance();
 	}
 
 	/**
@@ -67,7 +61,7 @@ public class MaterialesController extends HttpServlet {
 	public void destroy() {
 
 		super.destroy();
-		daomaterial = null;
+		dao = null;
 	}
 
 	@Override
@@ -82,19 +76,28 @@ public class MaterialesController extends HttpServlet {
 	/**
 	 * @see HttpServlet#HttpServlet()
 	 */
-	public MaterialesController() {
+	public RolController() {
 		super();
-
+		// TODO Auto-generated constructor stub
 	}
 
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
 		doProcess(request, response);
+
 	}
 
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+	 *      response)
+	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		// TODO Auto-generated method stub
 		doProcess(request, response);
 	}
 
@@ -102,17 +105,6 @@ public class MaterialesController extends HttpServlet {
 	private void doProcess(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		alert = null;
-
-		ServletContext context = request.getServletContext();
-		//
-		HashMap<Integer, String> usuarios = (HashMap<Integer, String>) context.getAttribute("usuarios_conectados");
-
-		if (usuarios == null) {
-
-			usuarios = new HashMap<Integer, String>();
-
-			context.setAttribute("usuarios_conectados", usuarios);
-		}
 
 		try {
 
@@ -150,61 +142,50 @@ public class MaterialesController extends HttpServlet {
 
 	private void listar(HttpServletRequest request) {
 
-		ArrayList<Material> materiales = new ArrayList<Material>();
+		ArrayList<Rol> rol = new ArrayList<Rol>();
 
-		materiales = daomaterial.getAll();
-		request.setAttribute("materiales", materiales);
+		rol = dao.getAll();
+		request.setAttribute("rol", rol);
 		dispatcher = request.getRequestDispatcher(VIEW_INDEX);
 
 	}
 
 	private void guardar(HttpServletRequest request) {
 
-		Material material = new Material();
+		Rol rol = new Rol();
 
 		try {
-			material.setNombre(nombre);
-			material.setId(id);
+			rol.setNombre(nombre);
+			rol.setId(id);
 
-			if (request.getParameter("precio") != null) {
+			if (request.getParameter("nombre") != null) {
 
-				precio = Float.parseFloat(request.getParameter("precio"));
-				material.setPrecio(precio);
+				rol.setNombre(nombre);
 
 			}
 
-			if (request.getParameter("precio") != null) {
-				precio = Float.parseFloat(request.getParameter("precio"));
-			} else {
-				precio = 0;
-			}
-
-			if (material.getNombre() == "") {
+			if (rol.getNombre() == "") {
 				alert = new Alert("Tienes que introducir un nombre", Alert.TIPO_DANGER);
 
 			} else {
 				// TODO hacer que el precio no este en blanco y solo acepte numeros
 
-				if (material.getNombre().length() > 45) {
+				if (rol.getNombre().length() > 25) {
 
-					alert = new Alert("Maximo 45 palabras", Alert.TIPO_DANGER);
+					alert = new Alert("Maximo 25 palabras", Alert.TIPO_DANGER);
 				}
 
 				else {
-					if (material.getPrecio() < 0) {
-						alert = new Alert("El precio debe ser mayor que 0", Alert.TIPO_DANGER);
+
+					if (dao.save(rol)) {
+
+						alert = new Alert("Rol Guardado", Alert.TIPO_PRIMARY);
+
 					} else {
 
-						if (daomaterial.save(material)) {
+						alert = new Alert("Lo sentimos pero no hemos podido guardar el rol,el rol ya existe",
+								Alert.TIPO_WARNING);
 
-							alert = new Alert("Material Guardado", Alert.TIPO_PRIMARY);
-
-						} else {
-
-							alert = new Alert(
-									"Lo sentimos pero no hemos podido guardar el material,el material ya existe",
-									Alert.TIPO_WARNING);
-						}
 					}
 				}
 
@@ -212,30 +193,30 @@ public class MaterialesController extends HttpServlet {
 		} catch (NumberFormatException e) {
 
 			e.printStackTrace();
-			alert = new Alert("No es un precio correcto");
+			alert = new Alert("No es posible meter un numero");
 
 		} catch (NullPointerException e) {
 			e.printStackTrace();
-			alert = new Alert("El precio no puede estar vacio");
+			alert = new Alert("El nombre no puede estar vacio");
 
 		}
 
-		request.setAttribute("material", material);
+		request.setAttribute("rol", rol);
 		dispatcher = request.getRequestDispatcher(VIEW_FORM);
 	}
 
 	private void buscar(HttpServletRequest request) {
 		alert = new Alert("Busqueda para: " + nombreBuscar, Alert.TIPO_PRIMARY);
-		ArrayList<Material> materiales = new ArrayList<Material>();
-		materiales = daomaterial.search(nombreBuscar);
-		request.setAttribute("materiales", materiales);
+		ArrayList<Rol> rol = new ArrayList<Rol>();
+		rol = dao.search(nombreBuscar);
+		request.setAttribute("rol", rol);
 		dispatcher = request.getRequestDispatcher(VIEW_INDEX);
 
 	}
 
 	private void eliminar(HttpServletRequest request) {
-		if (daomaterial.delete(id)) {
-			alert = new Alert("Material Eliminado id " + id, Alert.TIPO_PRIMARY);
+		if (dao.delete(id)) {
+			alert = new Alert("Rol Eliminado id " + id, Alert.TIPO_PRIMARY);
 		} else {
 			alert = new Alert("Error Eliminando, sentimos las molestias ", Alert.TIPO_WARNING);
 		}
@@ -245,14 +226,14 @@ public class MaterialesController extends HttpServlet {
 
 	private void mostrarFormulario(HttpServletRequest request) {
 
-		Material material = new Material();
+		Rol rol = new Rol();
 		if (id > -1) {
-			material = daomaterial.getById(id);
+			rol = dao.getById(id);
 
 		} else {
-			alert = new Alert("Nuevo Producto", Alert.TIPO_WARNING);
+			alert = new Alert("Nuevo Rol", Alert.TIPO_WARNING);
 		}
-		request.setAttribute("material", material);
+		request.setAttribute("rol", rol);
 		dispatcher = request.getRequestDispatcher(VIEW_FORM);
 	}
 
